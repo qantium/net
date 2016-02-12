@@ -13,12 +13,12 @@ import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.HashMap;
 import java.util.Map;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 /**
- *
  * @author ASolyankin
  */
 public class RestApiRequest {
@@ -26,8 +26,6 @@ public class RestApiRequest {
     private final HashMap<String, String> headers = new HashMap();
     private String responseEncoding = "UTF-8";
     private final String host;
-    private Object request;
-    private String protocol = "http://";
 
 
     public RestApiRequest(String host) {
@@ -36,14 +34,6 @@ public class RestApiRequest {
 
     public RestApiRequest(URL url) {
         this.host = url.toString();
-    }
-
-    public String getProtocol() {
-        return protocol;
-    }
-
-    public void setProtocol(String protocol) {
-        this.protocol = protocol;
     }
 
     public String getHost() {
@@ -79,30 +69,34 @@ public class RestApiRequest {
         return headers.get(key);
     }
 
-    private boolean isJSON(Object request){
-
-        try {
-            this.request = new JSONObject(request.toString());
-            return true;
-        } catch (JSONException ex) {
-
-        }
-
-        try {
-            this.request = new JSONArray(request.toString());
-            return true;
-        } catch (JSONException ex) {
-
-        }
-
-        this.request = request.toString();
-        return false;
+    private boolean isJSON(Object request) {
+        return isJSONObject(request) || isJSONArray(request);
     }
+
+
+    private boolean isJSONObject(Object request) {
+        try {
+            new JSONObject(request.toString());
+            return true;
+        } catch (JSONException ex) {
+            return false;
+        }
+    }
+
+    private boolean isJSONArray(Object request) {
+        try {
+            new JSONArray(request.toString());
+            return true;
+        } catch (JSONException ex) {
+            return false;
+        }
+    }
+
 
     public RestApiResponse send(Method method, Object request) throws RestApiException {
 
         HttpURLConnection connection = null;
-        String url = protocol + host;
+        String url = host;
 
         if (isJSON(request) || method == Method.DELETE) {
             setHeader("Content-Type", "application/json");
@@ -120,7 +114,7 @@ public class RestApiRequest {
             if (method != Method.GET) {
                 connection.setDoOutput(true);
                 OutputStream writer = new BufferedOutputStream(connection.getOutputStream());
-                writer.write(this.request.toString().getBytes(responseEncoding));
+                writer.write(request.toString().getBytes(responseEncoding));
                 writer.flush();
             }
 
@@ -141,7 +135,7 @@ public class RestApiRequest {
 
             throw new RestApiException("Cannot send to " + host + " request:\n" + request + "\n" + ex).setResponseCode(ex.getResponseCode());
 
-        }finally {
+        } finally {
 
             if (connection != null) {
                 connection.disconnect();

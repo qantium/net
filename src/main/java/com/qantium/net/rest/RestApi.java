@@ -10,7 +10,6 @@ import java.util.Map;
  */
 public class RestApi {
 
-    private String protocol = "http://";
     private String host;
     private String login;
     private String password;
@@ -20,14 +19,6 @@ public class RestApi {
 
     public RestApi(String host) {
         this.host = host;
-    }
-
-    public String getProtocol() {
-        return protocol;
-    }
-
-    public void setProtocol(String protocol) {
-        this.protocol = protocol;
     }
 
     public String getHost() {
@@ -91,9 +82,12 @@ public class RestApi {
         return this;
     }
 
-    public RestApiRequest getRequest(String url) {
+    public RestApiRequest createRequest() {
+        return createRequest("");
+    }
+
+    public RestApiRequest createRequest(String url) {
         RestApiRequest request = new RestApiRequest(getHost() + url);
-        request.setProtocol(protocol);
         request.setResponseEncoding(responseEncoding);
         request.setHeaders(headers);
         return request;
