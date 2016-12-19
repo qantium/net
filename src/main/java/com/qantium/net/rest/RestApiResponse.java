@@ -28,11 +28,11 @@ public class RestApiResponse {
         }
     }
 
-    public JSONArray toJSONArray() throws RestApiException {
+    public JSONArray toJSONArray() throws JSONException {
         try {
             return new JSONArray(response);
         } catch (JSONException ex) {
-            throw new RestApiException("Cannot get JSONArray from response: " + response + "\nCause: " + ex, ex);
+            throw new JSONException("Cannot get JSONArray from response: " + response + "\nCause: " + ex);
         }
     }
 }
