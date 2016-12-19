@@ -92,7 +92,6 @@ public class RestApiRequest {
         }
     }
 
-
     public RestApiResponse send(Method method, Object request) throws RestApiException {
 
         HttpURLConnection connection = null;
@@ -124,19 +123,12 @@ public class RestApiRequest {
                 String response = readStreamToString(connection.getInputStream(), responseEncoding);
                 return new RestApiResponse(response);
             } else {
-                throw new RestApiException("Connection is broken!").setResponseCode(responseCode);
+                throw new RestApiException(responseCode).setHost(host).setRequest(request);
             }
 
         } catch (IOException ex) {
-
-            throw new RestApiException("Cannot send to " + host + " request:\n" + request + "\n" + ex);
-
-        } catch (RestApiException ex) {
-
-            throw new RestApiException("Cannot send to " + host + " request:\n" + request + "\n" + ex).setResponseCode(ex.getResponseCode());
-
-        } finally {
-
+            throw new RestApiException(ex).setHost(host).setRequest(request);
+        }  finally {
             if (connection != null) {
                 connection.disconnect();
             }

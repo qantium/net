@@ -20,11 +20,11 @@ public class RestApiResponse {
         return response;
     }
 
-    public JSONObject toJSONObject() throws RestApiException {
+    public JSONObject toJSONObject() throws JSONException {
         try {
             return new JSONObject(response);
         } catch (JSONException ex) {
-            throw new RestApiException("Cannot get JSONObject from response: \n" + response + "\n" + ex);
+            throw new JSONException("Cannot get JSONObject from response: " + response + "\nCause: " + ex);
         }
     }
 
@@ -32,7 +32,7 @@ public class RestApiResponse {
         try {
             return new JSONArray(response);
         } catch (JSONException ex) {
-            throw new RestApiException("Cannot get JSONArray from response \n" + response + "\n" + ex);
+            throw new RestApiException("Cannot get JSONArray from response: " + response + "\nCause: " + ex, ex);
         }
     }
 }
