@@ -3,7 +3,7 @@ package com.qantium.net.rest;
 /**
  * @author Anton Solyankin
  */
-public class RestApiException extends Exception {
+public class RestApiException extends RuntimeException {
 
     private int responseCode = -1;
     private String host;
@@ -11,7 +11,7 @@ public class RestApiException extends Exception {
     private Object response;
 
     public RestApiException(int responseCode) {
-        this("Cannot send response", responseCode);
+        this("Cannot send request", responseCode);
 
     }
 

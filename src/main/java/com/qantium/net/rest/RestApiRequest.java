@@ -4,19 +4,16 @@ package com.qantium.net.rest;
  * Created by Solan on 22.01.2016.
  */
 
-import java.io.BufferedOutputStream;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.*;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.nio.file.Files;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * @author ASolyankin
@@ -26,6 +23,8 @@ public class RestApiRequest {
     private final HashMap<String, String> headers = new HashMap();
     private String responseEncoding = "UTF-8";
     private final String host;
+    private File file;
+    private boolean writeToFile;
 
 
     public RestApiRequest(String host) {
@@ -120,7 +119,7 @@ public class RestApiRequest {
             int responseCode = connection.getResponseCode();
 
             if (responseCode == HttpURLConnection.HTTP_OK) {
-                String response = readStreamToString(connection.getInputStream(), responseEncoding);
+                String response = getResponseContent(connection.getInputStream());
                 return new RestApiResponse(response);
             } else {
                 throw new RestApiException(responseCode).setHost(host).setRequest(request);
@@ -155,6 +154,17 @@ public class RestApiRequest {
         return delete("");
     }
 
+    private String getResponseContent(InputStream in) throws IOException {
+        if(writeToFile) {
+            file.delete();
+            Files.copy(in, file.toPath());
+            return new String(Files.readAllBytes(file.toPath()));
+        } else {
+            return readStreamToString(in, responseEncoding);
+        }
+
+    }
+
     private String readStreamToString(InputStream in, String encoding) throws IOException {
         StringBuilder builder = new StringBuilder();
         InputStreamReader reader = new InputStreamReader(in, encoding);
@@ -167,4 +177,13 @@ public class RestApiRequest {
         return builder.toString();
     }
 
+    public RestApiRequest writeToFile(File file) {
+        this.file = file;
+        return writeToFile(true);
+    }
+
+    public RestApiRequest writeToFile(boolean writeToFile) {
+        this.writeToFile = writeToFile;
+        return this;
+    }
 }
