@@ -25,6 +25,7 @@ public class RestApiRequest {
     private final String host;
     private File file;
     private boolean writeToFile;
+    private int successfulResponseCode = HttpURLConnection.HTTP_OK;
 
 
     public RestApiRequest(String host) {
@@ -118,9 +119,9 @@ public class RestApiRequest {
 
             int responseCode = connection.getResponseCode();
 
-            if (responseCode == HttpURLConnection.HTTP_OK) {
+            if (responseCode == successfulResponseCode) {
                 String response = getResponseContent(connection.getInputStream());
-                return new RestApiResponse(response);
+                return new RestApiResponse(response, responseCode);
             } else {
                 throw new RestApiException(responseCode).setHost(host).setRequest(request);
             }
@@ -184,6 +185,15 @@ public class RestApiRequest {
 
     public RestApiRequest writeToFile(boolean writeToFile) {
         this.writeToFile = writeToFile;
+        return this;
+    }
+
+    public int getSuccessfulResponseCode() {
+        return successfulResponseCode;
+    }
+
+    public RestApiRequest withSuccessfulResponseCode(int successfulResponseCode) {
+        this.successfulResponseCode = successfulResponseCode;
         return this;
     }
 }

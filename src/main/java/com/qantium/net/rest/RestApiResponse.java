@@ -10,9 +10,15 @@ import org.json.JSONObject;
 public class RestApiResponse {
 
     private final String response;
+    private final int responseCode;
 
-    RestApiResponse(String response) {
+    RestApiResponse(String response, int responseCode) {
         this.response = response;
+        this.responseCode = responseCode;
+    }
+
+    public int getResponseCode() {
+        return responseCode;
     }
 
     @Override

@@ -28,6 +28,10 @@ public class RestApiException extends RuntimeException {
         this("Cannot send request", ex);
     }
 
+    public int getResponseCode() {
+        return responseCode;
+    }
+
     public String getHost() {
         return host;
     }
