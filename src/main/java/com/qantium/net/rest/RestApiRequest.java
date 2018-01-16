@@ -26,6 +26,8 @@ public class RestApiRequest {
     private File file;
     private boolean writeToFile;
     private int successfulResponseCode = HttpURLConnection.HTTP_OK;
+    private Integer connectTimeout;
+    private Integer readTimeout;
 
 
     public RestApiRequest(String host) {
@@ -61,6 +63,30 @@ public class RestApiRequest {
         return this;
     }
 
+    public Integer getConnectTimeout() {
+        return connectTimeout;
+    }
+
+    public RestApiRequest setConnectTimeout(Integer connectTimeout) {
+        if (connectTimeout != null && connectTimeout <= 0) {
+            throw new IllegalArgumentException("Connect timeout must be > 0");
+        }
+        this.connectTimeout = connectTimeout;
+        return this;
+    }
+
+    public Integer getReadTimeout() {
+        return readTimeout;
+    }
+
+    public RestApiRequest setReadTimeout(Integer readTimeout) {
+        if (readTimeout != null && readTimeout <= 0) {
+            throw new IllegalArgumentException("Read timeout must be > 0");
+        }
+        this.readTimeout = readTimeout;
+        return this;
+    }
+
     public HashMap<String, String> getHeaders() {
         return headers;
     }
@@ -72,7 +98,6 @@ public class RestApiRequest {
     private boolean isJSON(Object request) {
         return isJSONObject(request) || isJSONArray(request);
     }
-
 
     private boolean isJSONObject(Object request) {
         try {
@@ -106,6 +131,13 @@ public class RestApiRequest {
             connection = (HttpURLConnection) new URL(url).openConnection();
             connection.setRequestMethod(method.toString());
 
+            if (connectTimeout != null) {
+                connection.setConnectTimeout(connectTimeout);
+            }
+            if (readTimeout != null) {
+                connection.setReadTimeout(readTimeout);
+            }
+
             for (String key : headers.keySet()) {
                 connection.setRequestProperty(key, headers.get(key));
             }
@@ -128,7 +160,7 @@ public class RestApiRequest {
 
         } catch (IOException ex) {
             throw new RestApiException(ex).setHost(host).setRequest(request);
-        }  finally {
+        } finally {
             if (connection != null) {
                 connection.disconnect();
             }
@@ -156,7 +188,7 @@ public class RestApiRequest {
     }
 
     private String getResponseContent(InputStream in) throws IOException {
-        if(writeToFile) {
+        if (writeToFile) {
             file.delete();
             Files.copy(in, file.toPath());
             return new String(Files.readAllBytes(file.toPath()));

@@ -5,7 +5,6 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**
- *
  * @author Anton Solyankin
  */
 public class RestApi {
@@ -16,6 +15,8 @@ public class RestApi {
     private String basicAuthorization;
     private final Map<String, String> headers = new HashMap();
     private String responseEncoding = "UTF-8";
+    private Integer connectTimeout;
+    private Integer readTimeout;
 
     public RestApi(String host) {
         this.host = host;
@@ -55,6 +56,24 @@ public class RestApi {
         return this;
     }
 
+    public Integer getConnectTimeout() {
+        return connectTimeout;
+    }
+
+    public RestApi setConnectTimeout(Integer connectTimeout) {
+        this.connectTimeout = connectTimeout;
+        return this;
+    }
+
+    public Integer getReadTimeout() {
+        return readTimeout;
+    }
+
+    public RestApi setReadTimeout(Integer readTimeout) {
+        this.readTimeout = readTimeout;
+        return this;
+    }
+
     public Map<String, String> getHeaders() {
         return headers;
     }
@@ -88,6 +107,8 @@ public class RestApi {
 
     public RestApiRequest createRequest(String url) {
         RestApiRequest request = new RestApiRequest(getHost() + url);
+        request.setConnectTimeout(connectTimeout);
+        request.setReadTimeout(readTimeout);
         request.setResponseEncoding(responseEncoding);
         request.setHeaders(headers);
         return request;
